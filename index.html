@@ -11,7 +11,6 @@
       --bg: #121212;
       --card-bg: #1e1e1e;
       --text: #ffffff;
-      --accent: #4caf50;
     }
 
     * {
@@ -29,9 +28,6 @@
     }
 
     header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
       margin-bottom: 20px;
       padding-bottom: 10px;
       border-bottom: 1px solid #333;
@@ -61,7 +57,8 @@
       justify-content: center;
       text-align: center;
       aspect-ratio: 1 / 1.15;
-      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
       transition: transform 0.15s ease, background-color 0.2s;
       border: 1px solid #2c2c2c;
     }
@@ -82,91 +79,18 @@
       line-height: 1.2;
       word-break: break-word;
     }
-
-    /* Visor ampliado (Modal a pantalla completa) */
-    .viewer-overlay {
-      position: fixed;
-      inset: 0;
-      background-color: var(--bg);
-      z-index: 1000;
-      display: none;
-      flex-direction: column;
-    }
-
-    .viewer-overlay.active {
-      display: flex;
-    }
-
-    .viewer-header {
-      height: 48px;
-      background-color: #1a1a1a;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 12px;
-      border-bottom: 1px solid #333;
-    }
-
-    .viewer-title {
-      font-size: 0.95rem;
-      font-weight: 600;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .viewer-actions {
-      display: flex;
-      gap: 8px;
-    }
-
-    .btn {
-      background: #2c2c2c;
-      color: white;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      cursor: pointer;
-    }
-
-    .btn-close {
-      background: #d32f2f;
-      font-weight: bold;
-    }
-
-    iframe {
-      flex: 1;
-      width: 100%;
-      border: none;
-      background: #fff;
-    }
   </style>
 </head>
 <body>
 
   <header>
     <h1>Mis Herramientas</h1>
-    <button class="btn" onclick="agregarApp()">+ Añadir</button>
   </header>
 
   <main class="grid-container" id="appGrid"></main>
 
-  <!-- Contenedor ampliado para abrir la WebApp -->
-  <div class="viewer-overlay" id="viewer">
-    <div class="viewer-header">
-      <span class="viewer-title" id="viewerTitle">Cargando...</span>
-      <div class="viewer-actions">
-        <a id="externalLink" href="#" target="_blank" class="btn">↗</a>
-        <button class="btn btn-close" onclick="cerrarApp()">✕ Cerrar</button>
-      </div>
-    </div>
-    <iframe id="appFrame" src=""></iframe>
-  </div>
-
   <script>
-    // Lista inicial de tus WebApps desplegadas
-    const defaultApps = [
+    const apps = [
       {
         nombre: "Árboles Castro",
         url: "https://fotovideorostik.github.io/arboles-castro/",
@@ -185,66 +109,22 @@
       {
         nombre: "Agenda Grabación",
         url: "https://fotovideorostik.github.io/agenda-edicion-grabacion/",
-        icono: "🎬"
+        icono: "📅"
       }
     ];
 
-    // Carga desde memoria local si añadiste nuevas desde el móvil
-    let apps = JSON.parse(localStorage.getItem('mis_webapps')) || defaultApps;
-
     const grid = document.getElementById('appGrid');
-    const viewer = document.getElementById('viewer');
-    const appFrame = document.getElementById('appFrame');
-    const viewerTitle = document.getElementById('viewerTitle');
-    const externalLink = document.getElementById('externalLink');
 
-    function renderApps() {
-      grid.innerHTML = '';
-      apps.forEach((app) => {
-        const card = document.createElement('div');
-        card.className = 'app-card';
-        card.innerHTML = `
-          <div class="app-icon">${app.icono}</div>
-          <div class="app-title">${app.nombre}</div>
-        `;
-        card.onclick = () => abrirApp(app);
-        grid.appendChild(card);
-      });
-    }
-
-    function abrirApp(app) {
-      viewerTitle.textContent = app.nombre;
-      appFrame.src = app.url;
-      externalLink.href = app.url;
-      viewer.classList.add('active');
-    }
-
-    function cerrarApp() {
-      viewer.classList.remove('active');
-      appFrame.src = ''; // Libera memoria al cerrar
-    }
-
-    // Función rápida para añadir nuevas URLs directamente desde el teléfono
-    function agregarApp() {
-      const nombre = prompt("Nombre de la WebApp:");
-      if (!nombre) return;
-      const url = prompt("URL completa (https://...):");
-      if (!url) return;
-      const icono = prompt("Emoji de icono (ej. 🛠️, 📷, 📊):", "🌐") || "🌐";
-
-      apps.push({ nombre, url, icono });
-      localStorage.setItem('mis_webapps', JSON.stringify(apps));
-      renderApps();
-    }
-
-    // Soporte para el botón "Atrás" físico/gesto de Android
-    window.addEventListener('popstate', () => {
-      if (viewer.classList.contains('active')) {
-        cerrarApp();
-      }
+    apps.forEach((app) => {
+      const card = document.createElement('a');
+      card.className = 'app-card';
+      card.href = app.url;
+      card.innerHTML = `
+        <div class="app-icon">${app.icono}</div>
+        <div class="app-title">${app.nombre}</div>
+      `;
+      grid.appendChild(card);
     });
-
-    renderApps();
   </script>
 </body>
 </html>
